@@ -29,8 +29,7 @@ public class VaultCustomer {
 
    private String primaryPaymentMethodId;
 
-   @JsonDeserialize(using = ArrayMapDeserializer.class)
-   private Map<String, String> userDefinedFields;
+   private List<UDF> userDefinedFields;
 
    public String getCustomerId() {
       return customerId;
@@ -112,11 +111,11 @@ public class VaultCustomer {
       this.primaryPaymentMethodId = primaryPaymentMethodId;
    }
 
-   public Map<String, String> getUserDefinedFields() {
+   public List<UDF> getUserDefinedFields() {
       return userDefinedFields;
    }
 
-   public void setUserDefinedFields(Map<String, String> userDefinedFields) {
+   public void setUserDefinedFields(List<UDF> userDefinedFields) {
       this.userDefinedFields = userDefinedFields;
    }
 }

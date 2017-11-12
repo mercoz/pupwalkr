@@ -2,6 +2,7 @@ package com.pupwalkr.worldpay;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.List;
 import java.util.Map;
 
 public class UpdateCustomerRequest {
@@ -15,8 +16,7 @@ public class UpdateCustomerRequest {
    private boolean sendEmailReceipts;
    private String company;
    private String notes;
-   @JsonDeserialize(using = ArrayMapDeserializer.class)
-   private Map<String, String> userDefinedFields;
+   private List<UDF> userDefinedFields;
    private int customerDuplicateCheckIndicator;
 
    public String getCustomerId() {
@@ -107,11 +107,11 @@ public class UpdateCustomerRequest {
       this.customerDuplicateCheckIndicator = customerDuplicateCheckIndicator;
    }
 
-   public Map<String, String> getUserDefinedFields() {
+   public List<UDF> getUserDefinedFields() {
       return userDefinedFields;
    }
 
-   public void setUserDefinedFields(Map<String, String> userDefinedFields) {
+   public void setUserDefinedFields(List<UDF> userDefinedFields) {
       this.userDefinedFields = userDefinedFields;
    }
 }

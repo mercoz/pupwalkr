@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pupwalkr.dto.Booking;
+import com.pupwalkr.dto.BookingResponse;
 import com.pupwalkr.model.Packages;
 import com.pupwalkr.model.User;
 import com.pupwalkr.repository.UsersRepository;
+import com.pupwalkr.worldpay.Transaction;
+import com.pupwalkr.worldpay.UDF;
 import com.pupwalkr.worldpay.VaultCustomer;
 import com.pupwalkr.worldpay.WorldPay;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +43,9 @@ public class BookingsController {
    }
 
    @PostMapping
-   public ResponseEntity saveBookings(@PathVariable int customerId, @RequestBody Booking booking) {
+   public ResponseEntity<BookingResponse> saveBookings(@PathVariable int customerId, @RequestBody Booking booking) {
+      double toCharge = 0.0;
+
       User user = this.users.getOne(customerId);
       if (user == null) {
          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -59,37 +65,37 @@ public class BookingsController {
          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
 
-      String json = customer.getUserDefinedFields().getOrDefault("packages", "[\n" +
-              "  {\n" +
-              "    \"id\": 12345,\n" +
-              "    \"purchaseDate\": \"2017-11-11T21:34:55\",\n" +
-              "    \"totalBookings\": 20,\n" +
-              "    \"remaining\": 1,\n" +
-              "    \"amountPerWalk\": 13.00\n" +
-              "  }\n" +
-              "]");
+      int left = customer.getUserDefinedFields().stream()
+              .filter(t -> t.getUdfName().equalsIgnoreCase("udf1"))
+              .mapToInt(t -> Integer.parseInt(t.getUdfvalue()))
+              .findFirst()
+              .orElse(0);
 
-      try {
-         ObjectMapper mapper = new ObjectMapper();
-         mapper.registerModule(new JavaTimeModule());
-         List<Packages> packages = mapper.readValue(json, new TypeReference<List<Packages>>(){});
-         Pair<Boolean, Pair<Boolean, List<Packages>>> toCharge = this.findAvailableAndSubtract(packages);
-         if (!toCharge.getFirst()) {
-            // nothing to charge
-            return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
-         } else if (toCharge.getSecond().getFirst()) {
-            // need to fill up
-         } else {
-            // just update
-            this.worldPay.updateCustomer(worldPayId, customer);
-         }
-      } catch (IOException e) {
-         e.printStackTrace();
-         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      if (left > 0) {
+         List<UDF> fields = new ArrayList<>();
+         fields.add(new UDF("udf1", Integer.toString(left)));
+         customer.setUserDefinedFields(fields);
+         this.worldPay.updateCustomer(worldPayId, customer);
+      } else {
+         // charge them
+         left = 20;
+         toCharge = 260.0;
+         List<UDF> fields = new ArrayList<>();
+         fields.add(new UDF("udf1", Integer.toString(left)));
+         customer.setUserDefinedFields(fields);
+         this.worldPay.updateCustomer(worldPayId, customer);
       }
 
-      hashCode();
-      return new ResponseEntity<>(HttpStatus.OK);
+      toCharge += booking.getLineItems().stream()
+              .mapToDouble(t -> t.getQuantity() * t.getCost())
+              .sum();
+
+      Transaction t = this.worldPay.chargeCustomer(worldPayId, "1", toCharge);
+
+      BookingResponse response = new BookingResponse();
+      response.setTransactionId(Integer.toString(t.getTransactionId()));
+      response.setCreditsRemaining(Integer.toString(left));
+      return new ResponseEntity<>(response, HttpStatus.OK);
    }
 
    private Pair<Boolean, Pair<Boolean, List<Packages>>> findAvailableAndSubtract(List<Packages> availablePackages) {

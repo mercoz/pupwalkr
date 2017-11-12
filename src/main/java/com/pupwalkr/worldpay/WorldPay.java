@@ -49,11 +49,11 @@ public class WorldPay {
       request.setEmailAddress(customer.getEmailAddress());
       request.setUserDefinedFields(customer.getUserDefinedFields());
 
-      ResponseEntity<UpdateCustomerResponse> response =  rest.postForEntity(updateCustomer, request, UpdateCustomerResponse.class, customerId);
-      return response.getBody().getVaultCustomer();
+      rest.put(updateCustomer, request, customerId);
+      return customer;
    }
 
-   public void chargeCustomer(final String customerId, final String paymentId, final double amount) {
+   public Transaction chargeCustomer(final String customerId, final String paymentId, final double amount) {
       ChargeCustomerRequest request = new ChargeCustomerRequest();
       request.setAmount(amount);
       request.setDeveloperApplication(new DeveloperApplication());
@@ -62,11 +62,13 @@ public class WorldPay {
       token.setPaymentMethodId(paymentId);
       request.setPaymentVaultToken(token);
       ResponseEntity<ChargeCustomerResponse> response = rest.postForEntity(chargeCustomer, request, ChargeCustomerResponse.class);
+
+      return response.getBody().getTransaction();
    }
 
-   public void createPaymentAccount(final int customerId, final Card card) {
+   public void createPaymentAccount(final String customerId, final Card card) {
       CreateVaultAccountRequest request = new CreateVaultAccountRequest();
-      request.setCustomerId(Integer.toString(customerId));
+      request.setCustomerId(customerId);
       request.setDeveloperApplication(new DeveloperApplication());
       request.setCard(card);
       request.setAccountDuplicateCheckIndicator(0);
@@ -74,9 +76,9 @@ public class WorldPay {
       ResponseEntity<CreateVaultAccountResponse> response =  rest.postForEntity(createPaymentAccount, request, CreateVaultAccountResponse.class, customerId);
    }
 
-   public void createPaymentAccount(final int customerId, final Check check) {
+   public void createPaymentAccount(final String customerId, final Check check) {
       CreateVaultAccountRequest request = new CreateVaultAccountRequest();
-      request.setCustomerId(Integer.toString(customerId));
+      request.setCustomerId(customerId);
       request.setDeveloperApplication(new DeveloperApplication());
       request.setCheck(check);
       request.setAccountDuplicateCheckIndicator(0);
