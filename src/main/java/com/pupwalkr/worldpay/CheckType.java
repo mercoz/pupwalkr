@@ -1,0 +1,10 @@
+package com.pupwalkr.worldpay;
+
+public enum CheckType {
+   CORPORATE_CASH_DISBURSEMENT,
+   POINT_OF_SALE,
+   PREARRANGED_PAYMENT_OR_DEPOSIT,
+   TELEPHONE_INITIATED,
+   WEB_INITIATED,
+   POP
+}

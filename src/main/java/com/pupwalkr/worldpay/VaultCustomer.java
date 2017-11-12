@@ -1,8 +1,11 @@
 package com.pupwalkr.worldpay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VaultCustomer {
@@ -25,6 +28,9 @@ public class VaultCustomer {
    private List<VaultPaymentMethod> paymentMethods;
 
    private String primaryPaymentMethodId;
+
+   @JsonDeserialize(using = ArrayMapDeserializer.class)
+   private Map<String, String> userDefinedFields;
 
    public String getCustomerId() {
       return customerId;
@@ -104,5 +110,13 @@ public class VaultCustomer {
 
    public void setPrimaryPaymentMethodId(String primaryPaymentMethodId) {
       this.primaryPaymentMethodId = primaryPaymentMethodId;
+   }
+
+   public Map<String, String> getUserDefinedFields() {
+      return userDefinedFields;
+   }
+
+   public void setUserDefinedFields(Map<String, String> userDefinedFields) {
+      this.userDefinedFields = userDefinedFields;
    }
 }

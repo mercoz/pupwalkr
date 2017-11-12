@@ -1,11 +1,6 @@
 package com.pupwalkr.worldpay;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateCustomerResponse {
+public class UpdateCustomerResponse {
    private ResultType result;
 
    private ResponseCode responseCode;
@@ -55,5 +50,4 @@ public class CreateCustomerResponse {
    public void setVaultCustomer(VaultCustomer vaultCustomer) {
       this.vaultCustomer = vaultCustomer;
    }
-
 }

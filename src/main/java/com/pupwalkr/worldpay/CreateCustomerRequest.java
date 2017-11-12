@@ -1,5 +1,7 @@
 package com.pupwalkr.worldpay;
 
+import java.util.Map;
+
 public class CreateCustomerRequest {
    private String firstName;
    private String lastName;
@@ -13,6 +15,7 @@ public class CreateCustomerRequest {
    private String company;
    private String notes;
    private int customerDuplicateCheckIndicator;
+   private Map<String, String> userDefinedFields;
 
    public String getFirstName() {
       return firstName;
@@ -100,5 +103,13 @@ public class CreateCustomerRequest {
 
    public void setCustomerDuplicateCheckIndicator(int customerDuplicateCheckIndicator) {
       this.customerDuplicateCheckIndicator = customerDuplicateCheckIndicator;
+   }
+
+   public Map<String, String> getUserDefinedFields() {
+      return userDefinedFields;
+   }
+
+   public void setUserDefinedFields(Map<String, String> userDefinedFields) {
+      this.userDefinedFields = userDefinedFields;
    }
 }

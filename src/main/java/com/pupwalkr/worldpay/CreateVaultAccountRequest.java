@@ -4,6 +4,7 @@ public class CreateVaultAccountRequest {
    private String customerId;
    private DeveloperApplication developerApplication;
    private Card card;
+   private Check check;
    private int accountDuplicateCheckIndicator = 1;
 
    public String getCustomerId() {
@@ -28,6 +29,14 @@ public class CreateVaultAccountRequest {
 
    public void setCard(Card card) {
       this.card = card;
+   }
+
+   public Check getCheck() {
+      return check;
+   }
+
+   public void setCheck(Check check) {
+      this.check = check;
    }
 
    public int getAccountDuplicateCheckIndicator() {

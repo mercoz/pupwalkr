@@ -12,15 +12,6 @@ public class Walkr {
    @Column(name = "walkrid", nullable = false)
    private int walkrId;
 
-   @Column(name = "firstname")
-   private String firstName;
-
-   @Column(name="lastname")
-   private String lastName;
-
-   @Column
-   private long cell;
-
    @ElementCollection
    @CollectionTable(name="walkrszip", joinColumns = @JoinColumn(name="walkrid"))
    @Column(name="zipcode")
@@ -32,30 +23,6 @@ public class Walkr {
 
    public void setWalkrId(int walkrId) {
       this.walkrId = walkrId;
-   }
-
-   public String getFirstName() {
-      return firstName;
-   }
-
-   public void setFirstName(String firstName) {
-      this.firstName = firstName;
-   }
-
-   public String getLastName() {
-      return lastName;
-   }
-
-   public void setLastName(String lastName) {
-      this.lastName = lastName;
-   }
-
-   public long getCell() {
-      return cell;
-   }
-
-   public void setCell(long cell) {
-      this.cell = cell;
    }
 
    public Set<Integer> getZipCodes() {
