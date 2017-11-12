@@ -12,6 +12,7 @@ public class WorldPay {
    private final String retrieveCustomer = "https://gwapi.demo.securenet.com/api/Customers/{customerId}";
    private final String updateCustomer = "https://gwapi.demo.securenet.com/api/Customers/{customerId}";
    private final String createPaymentAccount = "https://gwapi.demo.securenet.com/api/Customers/{customerId}/PaymentMethod";
+   private final String chargeCustomer = "https://gwapi.demo.securenet.com/api/Payments/Charge";
 
    private RestTemplate rest;
 
@@ -38,10 +39,29 @@ public class WorldPay {
       return response.getBody().getVaultCustomer();
    }
 
-   public VaultCustomer updateCustomer(final int customerId) {
+   public VaultCustomer updateCustomer(final String customerId, VaultCustomer customer) {
       UpdateCustomerRequest request = new UpdateCustomerRequest();
+      request.setCustomerId(customerId);
+      request.setDeveloperApplication(new DeveloperApplication());
+      request.setFirstName(customer.getFirstName());
+      request.setLastName(customer.getLastName());
+      request.setAddress(customer.getAddress());
+      request.setEmailAddress(customer.getEmailAddress());
+      request.setUserDefinedFields(customer.getUserDefinedFields());
+
       ResponseEntity<UpdateCustomerResponse> response =  rest.postForEntity(updateCustomer, request, UpdateCustomerResponse.class, customerId);
       return response.getBody().getVaultCustomer();
+   }
+
+   public void chargeCustomer(final String customerId, final String paymentId, final double amount) {
+      ChargeCustomerRequest request = new ChargeCustomerRequest();
+      request.setAmount(amount);
+      request.setDeveloperApplication(new DeveloperApplication());
+      VaultToken token = new VaultToken();
+      token.setCustomerId(customerId);
+      token.setPaymentMethodId(paymentId);
+      request.setPaymentVaultToken(token);
+      ResponseEntity<ChargeCustomerResponse> response = rest.postForEntity(chargeCustomer, request, ChargeCustomerResponse.class);
    }
 
    public void createPaymentAccount(final int customerId, final Card card) {
